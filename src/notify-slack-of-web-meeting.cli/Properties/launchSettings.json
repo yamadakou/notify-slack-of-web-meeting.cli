@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "notify-slack-of-web-meeting.cli": {
+      "commandName": "Project",
+      "commandLineArgs": "register"
+    }
+  }
+}

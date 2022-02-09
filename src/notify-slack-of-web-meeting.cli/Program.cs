@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using CommandLine;
+using Microsoft.Office.Interop.Outlook;
 
 namespace notify_slack_of_web_meeting.cli
 {
