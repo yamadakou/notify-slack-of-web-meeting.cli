@@ -52,6 +52,7 @@ namespace notify_slack_of_web_meeting.cli
 
         static int Main(string[] args)
         {
+            // Settingコマンドを定義
             Func<SettingOptions, int> RunSettingAndReturnExitCode = opts =>
             {
                 Console.WriteLine("Run Setting");
@@ -97,6 +98,8 @@ namespace notify_slack_of_web_meeting.cli
 
                 return 1;
             };
+
+            // Registerコマンドを定義
             Func<RegisterOptions, int> RunRegisterAndReturnExitCode = opts =>
             {
                 Console.WriteLine("Run Register");
@@ -123,13 +126,13 @@ namespace notify_slack_of_web_meeting.cli
 
                 var webMeetingAppointments = new List<Outlook.AppointmentItem>();
 
-                // ZoomURLを特定するための正規表現
+                // Web会議（Zoom/Teams）のURLを特定するための正規表現
                 var webMeetingUrlRegexp = @"https?://[^(?!.*(/|.|\n).*$)]*\.?(zoom\.us|teams\.live\.com|teams\.microsoft\.com)/[A-Za-z0-9/?=]+";
 
                 foreach (Outlook.AppointmentItem nextOperatingDayAppointment in nextOperatingDayAppointments)
                 {
                     var appointmentBody = nextOperatingDayAppointment.Body;
-                    // ZoomURLが本文に含まれる予定を正規表現で検索し、リストに詰める
+                    // Web会議のURLが本文に含まれる予定を正規表現で検索し、リストに詰める
                     if (!String.IsNullOrEmpty(appointmentBody) && Regex.IsMatch(appointmentBody, webMeetingUrlRegexp))
                     {
                         webMeetingAppointments.Add(nextOperatingDayAppointment);
@@ -203,7 +206,7 @@ namespace notify_slack_of_web_meeting.cli
                     var postData = JsonConvert.SerializeObject(addWebMetting);
                     var postContent = new StringContent(postData, Encoding.UTF8, "application/json");
                     Console.WriteLine($"[POST] {endPointUrl}");
-                    Console.WriteLine($" Body:{postContent}");
+                    Console.WriteLine($" Body: {JsonConvert.SerializeObject(addWebMetting, Formatting.Indented)}");
                     var responsePost = s_HttpClient.PostAsync(endPointUrl, postContent).Result;
                     Console.WriteLine($" responsePost:{JsonConvert.SerializeObject(responsePost)}");
                 }
@@ -213,6 +216,7 @@ namespace notify_slack_of_web_meeting.cli
                 return 1;
             };
 
+            // コマンドを実行
             return CommandLine.Parser.Default.ParseArguments<SettingOptions, RegisterOptions>(args)
                 .MapResult(
                     (SettingOptions opts) => RunSettingAndReturnExitCode(opts),
