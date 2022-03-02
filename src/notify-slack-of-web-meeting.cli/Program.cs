@@ -205,7 +205,7 @@ namespace notify_slack_of_web_meeting.cli
                     Console.WriteLine($"[POST] {endPointUrl}");
                     Console.WriteLine($" Body:{postContent}");
                     var responsePost = s_HttpClient.PostAsync(endPointUrl, postContent).Result;
-                    Console.WriteLine($" responseDelete:{JsonConvert.SerializeObject(responsePost)}");
+                    Console.WriteLine($" responsePost:{JsonConvert.SerializeObject(responsePost)}");
                 }
 
                 #endregion
