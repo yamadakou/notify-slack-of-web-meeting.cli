@@ -81,11 +81,8 @@ namespace notify_slack_of_web_meeting.cli
             .SetHandlerLifetime(TimeSpan.FromMinutes(5))  // ライフタイムを5分に設定
             .AddPolicyHandler(GetRetryPolicy());
 
-            // Microsoft DependancyInjection
-            var provider = services.BuildServiceProvider();
-
-            // Microsoft Http クライアントファクトリーを取得
-            var factory = provider.GetRequiredService<IHttpClientFactory>();
+            // HTTPクライアントファクトリーを取得
+            var factory = services.BuildServiceProvider().GetRequiredService<IHttpClientFactory>();
 
             // リトライ可能なHTTPクライアントを取得
             s_HttpClient = factory.CreateClient("RetryHttpClient");
