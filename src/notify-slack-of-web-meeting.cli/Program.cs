@@ -124,7 +124,7 @@ namespace notify_slack_of_web_meeting.cli
                 };
 
                 // jsonに設定を出力
-                var settingJsonString = JsonConvert.SerializeObject(setting);
+                var settingJsonString = JsonConvert.SerializeObject(setting, Formatting.Indented);
                 if (File.Exists(opts.Filepath))
                 {
                     File.Delete(opts.Filepath);
