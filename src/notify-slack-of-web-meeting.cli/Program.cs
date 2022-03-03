@@ -75,6 +75,8 @@ namespace notify_slack_of_web_meeting.cli
 
         static int Main(string[] args)
         {
+            #region HTTPクライアントを設定
+
             // Serviceにリトライ可能なHTTPクライアントを設定
             var services = new ServiceCollection();
             services.AddHttpClient("RetryHttpClient")
@@ -86,6 +88,10 @@ namespace notify_slack_of_web_meeting.cli
 
             // リトライ可能なHTTPクライアントを取得
             s_HttpClient = factory.CreateClient("RetryHttpClient");
+
+            #endregion
+
+            #region Settingコマンド
 
             // Settingコマンドを定義
             Func<SettingOptions, int> RunSettingAndReturnExitCode = opts =>
@@ -133,6 +139,10 @@ namespace notify_slack_of_web_meeting.cli
 
                 return 1;
             };
+
+            #endregion
+
+            #region  Registerコマンド
 
             // Registerコマンドを定義
             Func<RegisterOptions, int> RunRegisterAndReturnExitCode = opts =>
@@ -250,6 +260,8 @@ namespace notify_slack_of_web_meeting.cli
 
                 return 1;
             };
+
+            #endregion
 
             // コマンドを実行
             return CommandLine.Parser.Default.ParseArguments<SettingOptions, RegisterOptions>(args)
