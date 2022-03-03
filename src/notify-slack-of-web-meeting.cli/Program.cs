@@ -18,6 +18,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Http;
 using Polly;
 using Polly.Extensions.Http;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using NLog;
+using NLog.Extensions.Logging;
 
 // # ※リトライ可能なHTTP要求を実現するための参考
 // ## Microsoft Docs
@@ -38,10 +42,20 @@ using Polly.Extensions.Http;
 // * Microsoft.Extensions.Http.Polly
 //   * https://www.nuget.org/packages/Microsoft.Extensions.Http.Polly/5.0.1
 
+// # ※NLogの参考
+// ## チュートリアル
+// * https://github.com/NLog/NLog/wiki/Getting-started-with-.NET-Core-2---Console-application
+
+
 namespace notify_slack_of_web_meeting.cli
 {
     class Program
     {
+        /// <summary>
+        /// Logger
+        /// </summary>
+        private static Logger s_logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// HTTPクライアント
         /// </summary>
@@ -96,7 +110,7 @@ namespace notify_slack_of_web_meeting.cli
             // Settingコマンドを定義
             Func<SettingOptions, int> RunSettingAndReturnExitCode = opts =>
             {
-                Console.WriteLine("Run Setting");
+                s_logger.Info("Run Setting");
 
                 #region 引数の値でSlackチャンネル情報を登録
                 var addSlackChannel = new SlackChannel()
@@ -125,6 +139,7 @@ namespace notify_slack_of_web_meeting.cli
 
                 // jsonに設定を出力
                 var settingJsonString = JsonConvert.SerializeObject(setting, Formatting.Indented);
+                s_logger.Info(settingJsonString);
                 if (File.Exists(opts.Filepath))
                 {
                     File.Delete(opts.Filepath);
@@ -147,8 +162,8 @@ namespace notify_slack_of_web_meeting.cli
             // Registerコマンドを定義
             Func<RegisterOptions, int> RunRegisterAndReturnExitCode = opts =>
             {
-                Console.WriteLine("Run Register");
-                Console.WriteLine($"filepath:{opts.Filepath}");
+                s_logger.Info("Run Register");
+                s_logger.Debug($"filepath:{opts.Filepath}");
 
                 var application = new Outlook.Application();
 
@@ -163,7 +178,7 @@ namespace notify_slack_of_web_meeting.cli
                 DateTime startDate = DateTime.Today.AddDays(1);
                 DateTime endDate = startDate.AddDays(1);
                 Outlook.Items nextOperatingDayAppointments = GetAppointmentsInRange(calFolder, startDate, endDate);
-                Console.WriteLine($"nextOperatingDayAppointments.Count:{nextOperatingDayAppointments.Count}");
+                s_logger.Debug($"nextOperatingDayAppointments.Count:{nextOperatingDayAppointments.Count}");
 
                 #endregion
 
@@ -183,7 +198,7 @@ namespace notify_slack_of_web_meeting.cli
                         webMeetingAppointments.Add(nextOperatingDayAppointment);
                     }
                 }
-                Console.WriteLine(JsonConvert.SerializeObject(webMeetingAppointments));
+                s_logger.Debug(JsonConvert.SerializeObject(webMeetingAppointments));
 
                 #endregion
 
@@ -214,7 +229,7 @@ namespace notify_slack_of_web_meeting.cli
                         RegisteredBy = setting.RegisteredBy,
                         SlackChannelId = setting.SlackChannelId
                     };
-                    Console.WriteLine(JsonConvert.SerializeObject(addWebMetting));
+                   s_logger.Debug(JsonConvert.SerializeObject(addWebMetting));
                     addWebMettings.Add(addWebMetting);
                 }
                 if(!addWebMettings.Any())
@@ -236,9 +251,9 @@ namespace notify_slack_of_web_meeting.cli
                 foreach (var getWebMeeting in getWebMeetings)
                 {
                     var deleteEndPointUrl = $"{endPointUrl}/{getWebMeeting.Id}";
-                    Console.WriteLine($"[DELETE] {deleteEndPointUrl}");
+                   s_logger.Info($"[DELETE] {deleteEndPointUrl}");
                     var responseDelete = s_HttpClient.DeleteAsync(deleteEndPointUrl).Result;
-                    Console.WriteLine($" responseDelete:{JsonConvert.SerializeObject(responseDelete)}");
+                   s_logger.Info($" responseDelete:{JsonConvert.SerializeObject(responseDelete)}");
                 }
 
                 #endregion
@@ -250,10 +265,10 @@ namespace notify_slack_of_web_meeting.cli
                 {
                     var postData = JsonConvert.SerializeObject(addWebMetting);
                     var postContent = new StringContent(postData, Encoding.UTF8, "application/json");
-                    Console.WriteLine($"[POST] {endPointUrl}");
-                    Console.WriteLine($" Body: {JsonConvert.SerializeObject(addWebMetting, Formatting.Indented)}");
+                   s_logger.Info($"[POST] {endPointUrl}");
+                   s_logger.Info($" Body: {JsonConvert.SerializeObject(addWebMetting, Formatting.Indented)}");
                     var responsePost = s_HttpClient.PostAsync(endPointUrl, postContent).Result;
-                    Console.WriteLine($" responsePost:{JsonConvert.SerializeObject(responsePost)}");
+                   s_logger.Info($" responsePost:{JsonConvert.SerializeObject(responsePost)}");
                 }
 
                 #endregion
@@ -285,14 +300,14 @@ namespace notify_slack_of_web_meeting.cli
                             + startTime.ToString("g")
                             + "' AND [End] <= '"
                             + endTime.ToString("g") + "'";
-            Console.WriteLine(filter);
+           s_logger.Debug(filter);
             try
             {
                 Outlook.Items calItems = folder.Items;
                 calItems.IncludeRecurrences = true;
                 calItems.Sort("[Start]", Type.Missing);
                 Outlook.Items restrictItems = calItems.Restrict(filter);
-                Console.WriteLine($"Outlook.Items.Count:{restrictItems.Count}");
+               s_logger.Debug($"Outlook.Items.Count:{restrictItems.Count}");
                 if (restrictItems.Count > 0)
                 {
                     return restrictItems;
