@@ -242,7 +242,7 @@ namespace notify_slack_of_web_meeting.cli
                 #region 引数のパスに存在するsetting.jsonに設定されているエンドポイントURLを使い、Web会議情報を削除
 
                 var endPointUrl = $"{setting.EndpointUrl}{"WebMeetings"}";
-                var getEndPointUrl = $"{endPointUrl}?fromDate={startDate}&toDate={endDate}";
+                var getEndPointUrl = $"{endPointUrl}?fromDate={startDate}&toDate={endDate}&slackChannelId={setting.SlackChannelId}";
                 var getWebMeetingsResult = s_HttpClient.GetAsync(getEndPointUrl).Result;
                 var getWebMeetingsString = getWebMeetingsResult.Content.ReadAsStringAsync().Result;
                 // Getしたコンテンツはメッセージ+Jsonコンテンツなので、Jsonコンテンツだけ無理やり取り出す
