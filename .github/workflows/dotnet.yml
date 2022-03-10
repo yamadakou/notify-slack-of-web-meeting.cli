@@ -9,20 +9,33 @@ on:
     branches: [ master ]
     paths: [ 'src/**' ]
     
+# 環境にあわせて修正してください。
+env:
+  # ソースファイルのあるフォルダ
+  SOURCE_FOLDER: src
+  AZURE_WEBAPP_NAME: notify-slack-of-web-meeting-yamadak    # set this to your application's name
+  AZURE_WEBAPP_PACKAGE_PATH: 'output'      # set this to the path to your web app project, defaults to the repository root
+  DOTNET_VERSION: '5.0.x'           # set this to the dot net version to use
+  
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 5.0.x
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
     - name: Restore dependencies
       run: dotnet restore
+      working-directory: ${{env.SOURCE_FOLDER}}
+
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build ${{env.SOURCE_FOLDER}} --no-restore
+
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test ${{env.SOURCE_FOLDER}} --no-build --verbosity normal
