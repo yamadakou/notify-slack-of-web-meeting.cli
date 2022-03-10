@@ -37,8 +37,8 @@ jobs:
 
     - name: Build
       run: dotnet build SOLUTION --no-restore
-      working-directory: ${{env.SOURCE_FOLDER}}
+      working-directory: ${{env.PROJECT_FOLDER}}
       
     - name: Test
       run: dotnet test SOLUTION --no-build --verbosity normal
-      working-directory: ${{env.SOURCE_FOLDER}}
+      working-directory: ${{env.PROJECT_FOLDER}}
