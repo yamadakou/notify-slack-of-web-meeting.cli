@@ -85,6 +85,9 @@ namespace notify_slack_of_web_meeting.cli
         {
             [Option('f', "filepath", HelpText = "Input setting file path.", Default = "./setting.json")]
             public string Filepath { get; set; }
+
+            [Option('d', "days", HelpText = "Number of days to get an appointment.", Default = 1)]
+            public int Days { get; set; }
         }
 
         static int Main(string[] args)
@@ -164,6 +167,7 @@ namespace notify_slack_of_web_meeting.cli
             {
                 s_logger.Info("Run Register");
                 s_logger.Debug($"filepath:{opts.Filepath}");
+                s_logger.Debug($"days:{opts.Days}");
 
                 var application = new Outlook.Application();
 
@@ -175,8 +179,9 @@ namespace notify_slack_of_web_meeting.cli
                             Outlook.OlDefaultFolders.olFolderCalendar)
                         as Outlook.Folder;
 
+                int days = opts.Days < 1 ? 1 : opts.Days;
                 DateTime startDate = DateTime.Today.AddDays(1);
-                DateTime endDate = startDate.AddDays(1);
+                DateTime endDate = startDate.AddDays(days);
                 Outlook.Items nextOperatingDayAppointments = GetAppointmentsInRange(calFolder, startDate, endDate);
                 s_logger.Debug($"nextOperatingDayAppointments.Count:{nextOperatingDayAppointments.Count}");
 
@@ -242,7 +247,7 @@ namespace notify_slack_of_web_meeting.cli
                 #region 引数のパスに存在するsetting.jsonに設定されているエンドポイントURLを使い、Web会議情報を削除
 
                 var endPointUrl = $"{setting.EndpointUrl}{"WebMeetings"}";
-                var getEndPointUrl = $"{endPointUrl}?fromDate={startDate}&toDate={endDate}&slackChannelId={setting.SlackChannelId}";
+                var getEndPointUrl = $"{endPointUrl}?fromDate={startDate}&slackChannelId={setting.SlackChannelId}";
                 var getWebMeetingsResult = s_HttpClient.GetAsync(getEndPointUrl).Result;
                 var getWebMeetingsString = getWebMeetingsResult.Content.ReadAsStringAsync().Result;
                 // Getしたコンテンツはメッセージ+Jsonコンテンツなので、Jsonコンテンツだけ無理やり取り出す
