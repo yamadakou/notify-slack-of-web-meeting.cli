@@ -27,7 +27,7 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@v1.7.2
+      uses: actions/setup-dotnet@v1
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
@@ -36,9 +36,9 @@ jobs:
       working-directory: ${{env.PROJECT_FOLDER}}
 
     - name: Build
-      run: dotnet SOLUTION build --no-restore
+      run: dotnet build SOLUTION --no-restore
       working-directory: ${{env.SOURCE_FOLDER}}
       
     - name: Test
-      run: dotnet SOLUTION test --no-build --verbosity normal
+      run: dotnet test SOLUTION --no-build --verbosity normal
       working-directory: ${{env.SOURCE_FOLDER}}
