@@ -31,6 +31,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="Interop.Microsoft.Office.Interop.Outlook">
+      <HintPath>..\..\dlls\Interop.Microsoft.Office.Interop.Outlook.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="nlog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
