@@ -9,20 +9,36 @@ on:
     branches: [ master ]
     paths: [ 'src/**' ]
     
+# 環境にあわせて修正してください。
+env:
+  # ソースファイルのあるフォルダ
+  SOURCE_FOLDER: src
+  # プロジェクトファイルのあるフォルダ
+  PROJECT_FOLDER: src/notify-slack-of-web-meeting.cli
+  # set this to the dot net version to use
+  DOTNET_VERSION: '5.0.x'
+  
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 5.0.x
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
     - name: Restore dependencies
       run: dotnet restore
+      working-directory: ${{env.PROJECT_FOLDER}}
+
     - name: Build
       run: dotnet build --no-restore
+      working-directory: ${{env.PROJECT_FOLDER}}
+      
     - name: Test
       run: dotnet test --no-build --verbosity normal
+      working-directory: ${{env.PROJECT_FOLDER}}
