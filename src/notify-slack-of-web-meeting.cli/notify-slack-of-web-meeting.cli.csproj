@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>notify_slack_of_web_meeting.cli</RootNamespace>
     <StartupObject>notify_slack_of_web_meeting.cli.Program</StartupObject>
   </PropertyGroup>
