@@ -192,7 +192,7 @@ namespace notify_slack_of_web_meeting.cli
                 var webMeetingAppointments = new List<Outlook.AppointmentItem>();
 
                 // Web会議（Zoom/Teams）のURLを特定するための正規表現
-                var webMeetingUrlRegexp = @"https?://[^(?!.*(/|.|\n).*$)]*\.?(zoom\.us|teams\.live\.com|teams\.microsoft\.com)/[A-Za-z0-9/?=]+";
+                var webMeetingUrlRegexp = @"https?(://|%3A%2F%2F)[^(?!.*(/|.|\n).*$)]*\.?(zoom\.us|teams\.live\.com|teams\.microsoft\.com)(/|%2F)[%A-Za-z0-9/?=]+";
 
                 foreach (Outlook.AppointmentItem nextOperatingDayAppointment in nextOperatingDayAppointments)
                 {
