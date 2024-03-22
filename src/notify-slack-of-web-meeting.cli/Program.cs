@@ -222,7 +222,8 @@ namespace notify_slack_of_web_meeting.cli
                 var addWebMettings = new List<WebMeeting>();
                 foreach (var webMeetingAppointment in webMeetingAppointments)
                 {
-                    var url = Regex.Match(webMeetingAppointment.Body, webMeetingUrlRegexp).Value;
+                    // Web会議のURLがURIエンコードされているれる場合を考慮し、URIデコードしてURLとして設定する。
+                    var url = Uri.UnescapeDataString(Regex.Match(webMeetingAppointment.Body, webMeetingUrlRegexp).Value);
                     var name = webMeetingAppointment.Subject;
                     // Outlook.AppointmentItem.Start には時刻の種類が未設定のため、現地時刻として設定する。
                     var startDateTime = new DateTime(webMeetingAppointment.Start.Ticks, DateTimeKind.Local);
